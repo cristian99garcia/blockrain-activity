@@ -1,96 +1,87 @@
+
 <!DOCTYPE html>
-
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Sugar BlockRain</title>
-    <link rel="stylesheet" media="not screen and (device-width: 1200px) and (device-height: 900px)"
-      href="lib/sugar-web/graphics/css/sugar-96dpi.css">
-    <link rel="stylesheet" media="screen and (device-width: 1200px) and (device-height: 900px)"
-      href="lib/sugar-web/graphics/css/sugar-200dpi.css">
-    <link rel="stylesheet" href="css/activity.css">
+    <head>
+        <meta charset="utf-8" />
 
-    <link rel="shortcut icon" type="image/png" href="assets/favicon.png">
-    <link rel="stylesheet" href="assets/css/style.css">
-  </head>
+        <title>Block rain</title>
+        <meta name="author" content="Aerolab" />
+        <link rel="stylesheet" media="not screen and (device-width: 1200px) and (device-height: 900px)"
+            href="lib/sugar-web/graphics/css/sugar-96dpi.css">
+        <link rel="stylesheet" media="screen and (device-width: 1200px) and (device-height: 900px)"
+            href="lib/sugar-web/graphics/css/sugar-200dpi.css">
+        <link rel="stylesheet" href="css/activity.css">
 
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    </script>
-  </head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+        <link rel="shortcut icon" href="assets/images/favicon.png">
 
-  <body>
-    <div id="main-toolbar" class="toolbar">
-      <button class="toolbutton" id="activity-button" title="Laser Mirror"></button>
-      <button class="toolbutton pull-right" id="stop-button" title="Stop"></button>
-    </div>
+        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="src/blockrain.css">
 
-    <section id="section" style="position: relative;">
-      <article id="example-slider">
-        <div class="example">
-          <div class="game" id="tetris-demo"></div>
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script', '', 'ga');
+        </script>
+
+    </head>
+
+    <body>
+        <div id="main-toolbar" class="toolbar">
+          <button class="toolbutton" id="activity-button" title="Laser Mirror"></button>
+          <hr />
+          <button class="toolbutton" id="btn-prev" title="Previous theme"></button>
+          <button class="toolbutton" id="btn-next" title="Next theme"></button>
+          <button class="toolbutton pull-right" id="stop-button" title="Stop"></button>
         </div>
-      </article>
-    </section>
 
-    <script src="assets/js/jquery-1.11.1.min.js"></script>
-    <script src="src/blockrain.jquery.libs.js"></script>
-    <script src="src/blockrain.jquery.src.js"></script>
-    <script src="src/blockrain.jquery.themes.js"></script>
+        <section id="hero" style="min-height:600px; height:auto;">
+            <div class="game" id="cover-tetris" style="display: block; width: 300px; height: 95%; padding: 0%; border: none; background-color: rgb(4, 3, 4); margin: auto"></div>
+        </section>
 
-    <script>
-      var $cover = $('#cover-tetris').blockrain({
-        autoplay: true,
-        autoplayRestart: true,
-        speed: 100,
-        autoBlockWidth: false,
-        autoBlockSize: 25,
-        theme: 'candy'
-      });
+        <script src="assets/js/jquery-1.11.1.min.js"></script>
+        <script src="src/blockrain.jquery.libs.js"></script>
+        <script src="src/blockrain.jquery.src.js"></script>
+        <script src="src/blockrain.jquery.themes.js"></script>
+        <script src="js/widgets.js"></script>
 
-      var versusSpeed = 100;
+        <script>
+          var $game = $('#cover-tetris').blockrain({
+                speed: 20,
+                theme: 'vim',
+                onStart: function() {
+                    ga( 'send', 'event', 'tetris', 'started');
+                },
+                onLine: function() {
+                    ga( 'send', 'event', 'tetris', 'line');
+                },
+                onGameOver: function(score) {
+                    ga( 'send', 'event', 'tetris', 'over', score);
+                }
+            });
 
-      var $versus1 = $('#tetris-versus-1 .game').blockrain({
-        autoplay: true,
-        autoplayRestart: true,
-        speed: versusSpeed,
-        onGameOver: function() {
-          $versus1.blockrain('restart');
-          $versus2.blockrain('restart');
-          var $score = $versus2.parent().find('.score');
-          $score.text( parseInt($score.text()) + 1 );
-        }
-      });
+            function switchTheme(next) {
+                var themes = Object.keys(BlockrainThemes);
+                var currentTheme = $game.blockrain('theme');
+                var currentIx = themes.indexOf(currentTheme);
 
-      var $versus2 = $('#tetris-versus-2 .game').blockrain({
-        autoplay: true,
-        autoplayRestart: true,
-        speed: versusSpeed,
-        onGameOver: function() {
-          $versus1.blockrain('restart');
-          $versus2.blockrain('restart');
-          var $score = $versus1.parent().find('.score');
-          $score.text( parseInt($score.text()) + 1 );
-        }
-      });
+                if( next ) { currentIx++; }
+                else { currentIx--; }
 
-      var $demo = $('#tetris-demo').blockrain({
-        speed: 20,
-        theme: 'candy',
-        onStart: function() {
-          ga( 'send', 'event', 'tetris', 'started');
-        },
-        onLine: function() {
-          ga( 'send', 'event', 'tetris', 'line');
-        },
-        onGameOver: function(score){
-          ga( 'send', 'event', 'tetris', 'over', score);
-        }
-      });
-    </script>
+                if( currentIx >= themes.length ){ currentIx = 0; }
+                if( currentIx < 0 ){ currentIx = themes.length-1; }
 
-  </body>
+                $game.blockrain('theme', themes[currentIx]);
+            }
+
+            document.getElementById("btn-prev").onclick = function() {
+                switchTheme(false);
+            };
+
+            document.getElementById("btn-next").onclick = function() {
+                switchTheme(true);
+            };
+        </script>
+    </body>
 </html>
