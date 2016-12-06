@@ -1,0 +1,7 @@
+[Activity]
+name = BlockRain
+activity_version = 1
+bundle_id = org.sugarlabs.BlockRain
+exec = sugar-activity-blockrain
+icon = activity-icon
+license = MIT
